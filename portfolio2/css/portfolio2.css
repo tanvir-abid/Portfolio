@@ -1463,7 +1463,7 @@ textarea{
 .mcard h2 {
     font-size: 20px;
 }
-.mcard h2, h3{
+.mcard h2,.mcard h3{
     text-align: center;
     text-transform: capitalize;
 }
