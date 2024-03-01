@@ -76,9 +76,17 @@ section{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
 
-    
+.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 222;
+    background-color: #e6e7ee; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .left-logo {
@@ -86,23 +94,23 @@ section{
     align-items: center;
     font-weight: bolder;
     font-size: 30px;
+    margin-left: 10px;
 }
 
-.left-log i {
-    font-size: 24px;
-    margin-right: 10px;
+.left-logo i {
+    font-size: 45px;
+    margin: 2px;
 }
 
 .menu-items-container {
     display: flex;
+    margin: 5px 0;
 }
 
 .menu-item {
-    margin-right: 5px;
+    margin: 5px 3px;
     padding: 8px 10px;
     background-color: #e6e7ee;
-    /* box-shadow: 4px 4px 8px #d9d9d9, -4px -4px 8px #ffffff;
-    border-radius: 10px; */
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
@@ -442,32 +450,43 @@ box-shadow: inset 5px 5px 10px #8d2e25,
 /*---------------------------------------*/
 /* service section */
 /*---------------------------------------*/
+.section-services{
+    min-height: 110vh;
+}
 .section-services .card-container{
     margin-top: 20px;
 }
 .card-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+    width: 90%;
+    margin: 0 auto;
 }
 
 .card {
     background: #e6e7ee;
+    padding: 10px;
     border-radius: 20px;
     margin: 10px;
-    box-shadow: 8px 8px 16px #d1d3d8, -8px -8px 16px #ffffff;
+    box-shadow: 4px 4px 10px #a6a6a6, -4px -4px 10px #ffffff;
 }
 
-.card-container .card{
-    width: 350px;
+.section-services .card{
+    transition: all 0.5s ease-in;
+    animation: appearIn 0.5s ease-in;
 }
 
 .card-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 20px 20px 0 20px;
+    padding: 20px;
+}
+
+.section-services .card-header{
+    border-radius: 20px;
+    box-shadow:inset 4px 4px 10px #a6a6a6,inset -4px -4px 10px #ffffff;
 }
 
 .card-header i {
@@ -516,8 +535,8 @@ box-shadow: inset 5px 5px 10px #8d2e25,
 }
 
 @media screen and (max-width: 768px) {
-    .card{
-        width: 100%;
+    .card-container{
+        grid-template-columns: 1fr;
     }
 }
 /*------------------------------------------*/
@@ -563,24 +582,34 @@ box-shadow: inset 5px 5px 10px #8d2e25,
 }
 
 .tab-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between; /* Adjust as needed */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     width: 90%;
     margin: 0 auto;
 }
 
 .tab-card {
-    width: 380px; /* 3 cards in a row, considering gap */
+    /* width: 380px;  */
     background: #e6e7ee;
     border-radius: 20px;
     padding: 20px;
     box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff;
     border: .0625rem solid rgba(243, 247, 250, .05);
-    margin-bottom: 20px; /* Adjust as needed */
+    margin-bottom: 20px; 
+    display: none;
+    transition: all 0.5s ease-in;
+    animation: appearIn 0.5s ease-in;
 }
 
+/* @keyframes appearIn {
+    from{opacity: 0;transform: translateY(10px);}
+    to{opacity: 1;transform: translateY(0px);}
+} */
+@keyframes appearIn {
+    from{opacity: 0;transform: scale(0.8);}
+    to{opacity: 1;transform: scale(1);}
+}
 
 .tab-card .header {
     display: flex;

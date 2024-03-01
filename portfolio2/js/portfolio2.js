@@ -124,8 +124,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 function createTopMenu(name, resumeUrl) {
     const menuItems = [
         { icon: '<i class="fa-solid fa-house"></i>', text: 'Home' },
-        { icon: '<i class="fa-solid fa-briefcase"></i>', text: 'Portfolio' },
         { icon: '<i class="fa-solid fa-gear"></i>', text: 'Services' },
+        { icon: '<i class="fa-solid fa-briefcase"></i>', text: 'Portfolio' },
         { icon: '<i class="fa-solid fa-file-signature"></i>', text: 'Contact' },
         // Add more items as needed
     ];
@@ -196,10 +196,7 @@ function createTopMenu(name, resumeUrl) {
     menuItems.forEach((item, index) => {
         const menuItem = document.createElement('div');
         menuItem.classList.add('menu-item');
-
-        const text = document.createElement('span');
-        text.innerHTML = `${item.icon} ${item.text}`;
-        menuItem.appendChild(text);
+        menuItem.innerHTML = `<span>${item.icon}</span><span class="menu-text">${item.text}</span>`
         menuItemsContainer.appendChild(menuItem)
 
         menuItem.addEventListener('click', function () {
@@ -211,10 +208,14 @@ function createTopMenu(name, resumeUrl) {
             // Add active class to the clicked item
             menuItem.classList.add('active');
             // Scroll to the corresponding section
-            const section = document.querySelector(`.section-${item.text.toLowerCase()}`);
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth' });
-            }
+            
+const section = document.querySelector(`.section-${item.text.toLowerCase()}`);
+if (section) {
+    const duration = 1000; // Adjust the duration as needed (in milliseconds)
+    smoothScrollTo(section, duration);
+}
+
+
         });
 
         // Add active class to Home menu item on page load
@@ -241,9 +242,39 @@ function createTopMenu(name, resumeUrl) {
     topMenu.appendChild(leftSide);
     topMenu.appendChild(rightSide);
 
+    if(window.innerWidth > 768){
+        window.addEventListener('scroll', function () {
+            const scrollPosition = window.scrollY;
+            if (scrollPosition > 10) {
+                topMenu.classList.add('sticky');
+            } else {
+                topMenu.classList.remove('sticky');
+            }
+        });
+    }
+
     return topMenu;
 }
+function smoothScrollTo(target, duration) {
+    const targetPosition = target.offsetTop - 100;
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    const startTime = performance.now();
 
+    function scrollAnimation(currentTime) {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+        const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+        window.scrollTo(0, startPosition + distance * easeInOutQuad(progress));
+
+        if (elapsedTime < duration) {
+            requestAnimationFrame(scrollAnimation);
+        }
+    }
+
+    requestAnimationFrame(scrollAnimation);
+}
 //----------------------------------------------------------//
 // create the slider //
 //---------------------------------------------------------//
@@ -438,9 +469,10 @@ function generateServiceCards(data) {
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container');
 
-    data.forEach(service => {
+    data.forEach((service,index) => {
         const card = document.createElement('div');
         card.classList.add('card');
+        card.style.display = 'none';
 
         // Card Header
         const cardHeader = document.createElement('div');
@@ -492,6 +524,21 @@ function generateServiceCards(data) {
 
         // Append Card to Card Container
         cardContainer.appendChild(card);
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // If the section is in view, display tab cards
+                    setTimeout(() => {
+                        card.style.display = 'block';
+                    },index*500)
+                    observer.unobserve(entry.target); // Stop observing once displayed
+                }
+            });
+        }); // Adjust threshold as needed
+        
+        // Observe the section containing tab cards
+        observer.observe(cardContainer);
     });
 
     return cardContainer;
@@ -528,7 +575,20 @@ function generateTabComponent(projectsData) {
     // Create tab cards for each project
     const tabCardsContainer = document.createElement('div');
     tabCardsContainer.classList.add('tab-cards-container');
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // If the section is in view, display tab cards
+                filterProjects('All');
+                observer.unobserve(entry.target); // Stop observing once displayed
+            }
+        });
+    }); // Adjust threshold as needed
     
+    // Observe the section containing tab cards
+    observer.observe(tabCardsContainer);
+
     function filterProjects(category) {
         const filteredProjects = category === 'All' ?
             projectsData :
@@ -536,7 +596,7 @@ function generateTabComponent(projectsData) {
 
         tabCardsContainer.innerHTML = '';
 
-        filteredProjects.forEach(project => {
+        filteredProjects.forEach((project, index) => {
 
             const tabCard = document.createElement('div');
             tabCard.classList.add('tab-card');
@@ -591,6 +651,9 @@ function generateTabComponent(projectsData) {
             tabCard.appendChild(footer);
 
             tabCardsContainer.appendChild(tabCard);
+            setTimeout(() => {
+                tabCard.style.display = 'block';
+            }, index * 500); 
         });
     }
 
