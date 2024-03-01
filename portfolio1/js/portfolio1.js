@@ -3,21 +3,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     generateMetaTags(data.metaTags);
     let container = document.querySelector('main');
     // typewriterWords 
-    // const loadingWords = ['The Best Web Developer. ','Loading...', 'The Best SEO Expert In Bangladesh. '];
-    // let loadingAnimationContainer = createLoadingAnimation(data['section-home'].ownerInfo.name, data.metaTags.keywords,loadingWords);
-    // container.append(loadingAnimationContainer);
+    const loadingWords = ['The Best Web Developer. ','Loading...', 'The Best SEO Expert In Bangladesh. '];
+    let loadingAnimationContainer = createLoadingAnimation(data['section-home'].ownerInfo.name, data.metaTags.keywords,loadingWords);
+    container.append(loadingAnimationContainer);
 
-    // // Calculate the total duration based on the length of typewriter words
-    // const totalDuration = loadingWords.reduce((acc, word) => acc + word.length, 0) * 61.2;
+    // Calculate the total duration based on the length of typewriter words
+    const totalDuration = loadingWords.reduce((acc, word) => acc + word.length, 0) * 61.2;
 
-    // setTimeout(() => {
-    //     loadingAnimationContainer.classList.add('active');
-    //     setTimeout(()=>{
-    //         loadingAnimationContainer.remove();
-    //         getDataAndGenrateInitialElements();
-    //     },300);
-    // }, totalDuration);
-    getDataAndGenrateInitialElements();
+    setTimeout(() => {
+        loadingAnimationContainer.classList.add('active');
+        setTimeout(()=>{
+            loadingAnimationContainer.remove();
+            getDataAndGenrateInitialElements();
+        },300);
+    }, totalDuration);
 });
 
 function createTwinklingStar() {
@@ -40,10 +39,7 @@ function twinklingStars() {
     setInterval(createTwinklingStar, 1000); // Create a new star every 2 seconds
 }
 
-// twinklingStars(); // Start twinkling stars animation
-
-
-
+//--------------------------------------------------------------------//
 function createLoadingAnimation(ownerName, keywords,typewriterWords) {
     const loadingContainer = document.createElement('div');
     loadingContainer.classList.add('loading-container');
@@ -153,7 +149,6 @@ async function getDataAndGenrateInitialElements(){
     skyContainer.classList.add('sky-container');
     // Create sun or moon element
     if (currentHour >= 6 && currentHour < 18) {
-        console.log("It's daytime!");
         document.body.style.background = 'linear-gradient(-120deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)';
         document.body.style.backgroundSize = '400% 400%';
 
@@ -167,7 +162,6 @@ async function getDataAndGenrateInitialElements(){
         birdScript.src = 'js/bird.js';
         document.body.appendChild(birdScript);
     } else {
-        console.log("It's nighttime!");
         document.body.style.background = "linear-gradient(-120deg, #2C5364, #203A43, #0F2027, #141E30,#03071e)";
         document.body.style.backgroundSize = '400% 400%';
 
@@ -278,7 +272,6 @@ async function getDataAndGenrateInitialElements(){
                 menuItem.classList.add('active');
                 let prevSection = document.querySelector("#main-container section");
                 let dataForNextSection = alldata[`section-${menuItem.id}`];
-                //console.log(dataForNextSection);
                 handleMenuItemClicks(menuItem.id,prevSection,dataForNextSection);
                 
             }
@@ -293,6 +286,9 @@ async function getDataAndGenrateInitialElements(){
     // generate main container div for furthur use //
     const mainContainer = document.createElement('div');
     mainContainer.id='main-container';
+    if (currentHour < 6 || currentHour > 18) {
+        mainContainer.classList.add('night');
+    }
     container.appendChild(mainContainer);
     //----------------------------------------------------//
     let menubar = document.createElement('span');
@@ -324,7 +320,7 @@ async function getDataAndGenrateInitialElements(){
     //---------------------------------------------//
 
     createSlideshow(alldata["section-home"].slides);
-    //createAboutContainer(alldata['section-about'].texts);
+    // createAboutContainer(alldata['section-about'].texts);
     // createServicesSection(alldata['section-services'].services);
     // createPortfolioSection(alldata['section-portfolio'].projects);
     // createContactSection(alldata['section-contact']);
@@ -689,6 +685,7 @@ function createSlideshow(slidesData) {
     const slideshowContainer = document.createElement('section');
     slideshowContainer.classList.add('slideshow-container');
     slideshowContainer.id = "section-home";
+    // slideshowContainer.style.height = (window.innerHeight-50)+'px';
 
     let btnContainer = document.createElement('div')
     btnContainer.classList.add('btn-container');
@@ -954,10 +951,10 @@ function createAboutContainer(paragraphs) {
 
     // Create h1, h3, and p tags for about contents
     const aboutTitle = document.createElement('h1');
-    aboutTitle.textContent = 'About Us';
+    aboutTitle.textContent = 'About Me';
 
     const aboutSubtitle = document.createElement('h3');
-    aboutSubtitle.textContent = 'Our Story';
+    aboutSubtitle.textContent = 'My Story';
 
     const aboutParaContainer = document.createElement('div');
     aboutParaContainer.className = 'about-texts';
@@ -990,7 +987,7 @@ function createServicesSection(servicesArray) {
     servicesSection.id = 'section-services';
 
     const serviceHeader = document.createElement('h1');
-    serviceHeader.textContent = "Services";
+    serviceHeader.innerHTML = '<i class="fa-solid fa-screwdriver-wrench"></i> Services';
     servicesSection.appendChild(serviceHeader);
     // Create container for services
     const servicesContainer = document.createElement('div');
@@ -1058,7 +1055,7 @@ function createSkillsSection(skillData) {
 
     // Heading
     const heading = document.createElement('h1');
-    heading.textContent = skillData.heading;
+    heading.innerHTML = `<i class="fa-solid fa-screwdriver-wrench"></i> ${skillData.heading}`;
 
     // Append heading to the skills section
     skillsSection.appendChild(heading);
@@ -1325,7 +1322,6 @@ function createPortfolioSection(projects) {
 }
 
 function displayProject(projectData) {
-    //console.log(projectData);
     // Create modal container
     const modalContainer = document.createElement('div');
     modalContainer.classList.add('modal-container');
@@ -1334,6 +1330,9 @@ function displayProject(projectData) {
     const modalContent = document.createElement('div');
     modalContent.classList.add('modal-content');
 
+    if (currentHour >= 6 || currentHour < 18) {
+        modalContent.classList.add('night');
+    }
     // Create modal header
     const modalHeader = document.createElement('div');
     modalHeader.classList.add('modal-header');
@@ -1540,7 +1539,6 @@ function createServicePlansHTML(plans, headerDiv, bodyDiv, article) {
         backButton.classList.add('back-button');
 
         planBtn.addEventListener('click', () => {
-            // Log the entire plan object to the console
             headerDiv.insertBefore(backButton, headerDiv.firstChild);
             plansContainer.innerHTML = '';
 
@@ -1591,17 +1589,44 @@ function createServicePlansHTML(plans, headerDiv, bodyDiv, article) {
             // Add event listener for form submission
             serviceContactForm.addEventListener('submit', (event) => {
                 event.preventDefault(); // Prevent default form submission
-                // Log form input values and plan details
-                console.log('Form Input:', {
-                    name: event.target.name.value,
-                    email: event.target.email.value,
-                    message: event.target.message.value,
-                    file: event.target.file.value
-                });
-                console.log('Selected Plan Details:', newPlanDetails);
+                // Get form data and convert it to an object
+                const formData = new FormData(serviceContactForm);
+                const object = Object.fromEntries(formData);
+
+                newPlanDetails.planName = `${headerDiv.querySelector("h2").textContent}-${capitalizeFirstLetter(newPlanDetails.planName)}`;
+                const newPlanDetailsString = Object.keys(newPlanDetails).map(key => `\n${key}: ${newPlanDetails[key]}`).join(', ');
+                object.message = `**Purchase Request:**${newPlanDetailsString}\n\n${object.message}`;
+                const json = JSON.stringify(object);
+
+                fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: json
+                })
+                .then(async (response) => {
+                    let json = await response.json();
+                    if (response.status == 200) {
+                        window.location.href = 'https://tanvir-abid.github.io/DevVoyager/thanks.html';
+                    } else {
+                        alert('Message not sent.');
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+
+
+
+
             });
 
         });
+
+
+
         backButton.addEventListener('click', () => {
             backButton.remove();
             // Call a function to re-create the plan details
@@ -1634,7 +1659,6 @@ function createServicePlansHTML(plans, headerDiv, bodyDiv, article) {
 // create contact section //
 //--------------------------------------//
 function createContactSection(contactData) {
-    console.log(contactData['paymentInfo']);
     // Create contact section
     const contactSection = document.createElement('section');
     contactSection.classList.add('contact-container','appear');
@@ -1692,7 +1716,7 @@ function createContactSection(contactData) {
 
     // create paymentInfo contents //
     const paymentInfoDiv = document.createElement('div');
-    paymentInfoDiv.classList.add('payment-indo-container');
+    paymentInfoDiv.classList.add('payment-info-container');
 
     const paymentDiv = generatePaymentMethodsHTML(contactData['paymentInfo']);
     paymentInfoDiv.appendChild(paymentDiv);
@@ -1720,7 +1744,39 @@ function createContactSection(contactData) {
     formHeader.appendChild(formSubHeading);
     contactForm.appendChild(formHeader);
     // Append the form to the contact form section
-    contactForm.appendChild(createContactForm());
+    let mainForm = createContactForm();
+    mainForm.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const submitButton = mainForm.querySelector('button[type="submit"]');
+        submitButton.innerHTML = `<i class="fa-solid fa-spinner spin"></i> Submitting`;
+
+        const formData = new FormData(mainForm);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: json
+        })
+        .then(async (response) => {
+            let json = await response.json();
+            if (response.status == 200) {
+                submitButton.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit`;
+                window.location.href = 'https://tanvir-abid.github.io/DevVoyager/thanks.html';
+            } else {
+                alert('Message not sent.');
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    })
+    contactForm.appendChild(mainForm);
 
     // Append contactFeature and contactForm to the contact section
     contactSection.appendChild(contactFeature);
@@ -1733,11 +1789,17 @@ function createContactSection(contactData) {
 function createContactForm() {
     // Create a simple contact form
     const form = document.createElement('form');
+    form.method = 'POST';
+    // Create a hidden input element
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'apikey';
+    hiddenInput.value = 'c8fb6cf0-85ce-49d9-be34-cbe21e1f7c9b';
 
     // Add form elements (customize based on your needs)
     const nameGroup = createInputGroup('Name', 'name');
+    const subjectGroup = createInputGroup('Subject', 'subject');
     const emailGroup = createInputGroup('Email', 'email');
-    const fileGroup = createInputGroup('File', 'file', 'file');
     const messageGroup = createInputGroup('Message', 'message', 'textarea');
 
     const submitButton = document.createElement('button');
@@ -1745,9 +1807,10 @@ function createContactForm() {
     submitButton.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit`;
 
     // Append form elements to the form
+    form.appendChild(hiddenInput);
     form.appendChild(nameGroup);
+    form.appendChild(subjectGroup);
     form.appendChild(emailGroup);
-    form.appendChild(fileGroup);
     form.appendChild(messageGroup);
     form.appendChild(submitButton);
 
@@ -1767,13 +1830,19 @@ function createInputGroup(labelText, inputName, inputType = 'text') {
     if (inputName.toLowerCase() === 'message') {
         // If input name is 'message', create a textarea
         input = document.createElement('textarea');
+        input.placeholder = `Write Details About Your Project. . .`;
     } else {
         // For other input names, create a regular input
         input = document.createElement('input');
         input.type = inputType;
+        input.placeholder = `Enter Your ${labelText} Here`;
     }
 
-    input.name = inputName;
+    if(inputName === 'file'){
+        input.name = 'attachment';
+    }else{
+        input.name = inputName;
+    }
     input.id = inputName;
 
     inputGroup.appendChild(label);
@@ -1866,18 +1935,14 @@ function generatePaymentMethodsHTML(paymentInfo) {
     const paymentInfoContentsDiv = document.createElement('div');
     paymentInfoContentsDiv.className = "payment-info-contents-div";
 
-    if (paymentInfo.bd.length > 0) {
+    if (paymentInfo.length > 0) {
         const paymentInfoContents = document.createElement('div');
         paymentInfoContents.className = "payment-info-contents";
 
         const bdPaymentList = document.createElement('ul');
         bdPaymentList.classList.add('payment-list', 'bd-payment-list');
 
-        const bdPaymentTitle = document.createElement('h4');
-        bdPaymentTitle.textContent = 'In Bangladesh';
-        paymentInfoContents.appendChild(bdPaymentTitle);
-
-        paymentInfo.bd.forEach(method => {
+        paymentInfo.forEach(method => {
             const listItem = document.createElement('li');
             const icon = document.createElement('span');
             icon.innerHTML = method.icon;
@@ -1889,31 +1954,12 @@ function generatePaymentMethodsHTML(paymentInfo) {
         paymentInfoContentsDiv.appendChild(paymentInfoContents);
     }
 
-    if (paymentInfo.foreign.length > 0) {
-        const paymentInfoContents = document.createElement('div');
-        paymentInfoContents.className = "payment-info-contents";
-
-        const foreignPaymentList = document.createElement('ul');
-        foreignPaymentList.classList.add('payment-list', 'foreign-payment-list');
-
-        const foreignPaymentTitle = document.createElement('h4');
-        foreignPaymentTitle.textContent = 'Foreign Transactions';
-        paymentInfoContents.appendChild(foreignPaymentTitle);
-
-        paymentInfo.foreign.forEach(method => {
-            const listItem = document.createElement('li');
-            const icon = document.createElement('span');
-            icon.innerHTML = method.icon;
-            listItem.appendChild(icon);
-            listItem.appendChild(document.createTextNode(method.method));
-            foreignPaymentList.appendChild(listItem);
-        });
-        paymentInfoContents.appendChild(foreignPaymentList);
-        paymentInfoContentsDiv.appendChild(paymentInfoContents);
-    }
     paymentMethodsContainer.appendChild(paymentInfoContentsDiv);
     return paymentMethodsContainer;
 }
 
 
-
+// Function to capitalize the first letter of a string
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
