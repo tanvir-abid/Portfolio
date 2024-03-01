@@ -87,23 +87,13 @@ function createLoadingAnimation(ownerName, keywords,typewriterWords) {
     return loadingContainer;
 }
 //------------------------------------------------------//
-// get data function that returns all the data //
-async function getdata() {
-  try {
-    const response = await fetch('data/data.json');
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error; // Re-throw the error to handle it elsewhere if needed
-  }
+async function getdata(){
+    return fetch('../data/data.json')
+        .then(response => response.json())
+        .then(data => {
+            return data;
+        });
 }
-
 //--------------------------------------------------//
 function generateMetaTags(metaData) {
     const head = document.head;

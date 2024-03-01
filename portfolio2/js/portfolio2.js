@@ -1,5 +1,5 @@
 function fetchData() {
-    return fetch('data/data.json')
+    return fetch('../data/data.json')
         .then(response => response.json())
         .then(data => {
             return data;
@@ -8,7 +8,6 @@ function fetchData() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     let allData = await fetchData();
-    console.log(allData['section-home'].slides[0].caption.buttonURL);
 
     let topMenu = createTopMenu(allData['section-home'].ownerInfo.name,allData['section-home'].slides[0].caption.buttonURL);
     document.querySelector('main').appendChild(topMenu);
@@ -481,8 +480,7 @@ function generateServiceCards(data) {
         const button = document.createElement('button');
         button.textContent = service.buttonText;
         button.addEventListener('click', function(){
-            console.log(service.name,service.plans.length);
-            createModal(service.name, service.plans.length)
+            createModal(service.name, service.plans)
         });
 
         cardFooter.appendChild(button);
@@ -581,7 +579,9 @@ function generateTabComponent(projectsData) {
 
             const button = document.createElement('button');
             button.textContent = 'Learn More';
-            button.addEventListener('click', () => window.open(project.projectURL, '_blank'));
+            button.addEventListener('click', () => {
+                createModal(project.title, project.projectURL, project.category)
+            });
 
             footer.appendChild(button);
 
@@ -1091,6 +1091,42 @@ function generateContactContainer(contactData, socialMediaData) {
 
     // Use the function to generate the contact form
     const contactForm = generateContactForm();
+    // Add submit event listener
+    contactForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent form submission
+        let submitButton = document.querySelector('.contact-form button');
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+        submitButton.disabled = true;
+        
+        const formData = new FormData(contactForm);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: json
+        })
+        .then(async (response) => {
+            let json = await response.json();
+            if (response.status == 200) {
+                submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+                createModal('Congratulations','Thank you for reaching out! Your message has been successfully submitted. I will get back to you as soon as possible. If you have any urgent inquiries, feel free to contact me directly via email or phone. Have a great day!');
+                submitButton.disabled = false; 
+                contactForm.reset();
+            } else {
+                alert('Message not sent.');
+                submitButton.disabled = false; 
+                submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    });
     contactFormContainer.appendChild(contactForm);
 
     contactContainer.appendChild(contactFormContainer);
@@ -1102,7 +1138,13 @@ function generateContactContainer(contactData, socialMediaData) {
 function generateContactForm() {
     const form = document.createElement('form');
     form.classList.add('contact-form');
-
+    form.method = 'POST';
+    // Create a hidden input element
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'apikey';
+    hiddenInput.value = 'c8fb6cf0-85ce-49d9-be34-cbe21e1f7c9b';
+    form.appendChild(hiddenInput);
     // Name Input
     const nameInputGroup = document.createElement('div');
     nameInputGroup.classList.add('input-group');
@@ -1163,19 +1205,7 @@ function generateContactForm() {
     submitButton.setAttribute('type', 'submit');
     submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
 
-    // Add submit event listener
-    form.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent form submission
-
-        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
-        submitButton.disabled = true;
-        
-        setTimeout(function () {
-            createModal('Congratulations','Your request has been submitted !');
-            submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
-            submitButton.disabled = false; 
-        }, 4000); 
-    });
+    
     form.appendChild(submitButton);
 
     return form;
@@ -1185,10 +1215,52 @@ function generateContactForm() {
 //--------------------------------------------------//
 // modal //
 //--------------------------------------------------//
-function createModal(title, content) {
+function generateLightBox(lightboxImages){
+    // Create lightbox container
+    const lightboxContainer = document.createElement('div');
+    lightboxContainer.classList.add('lightbox-container');
+
+    // Create lightbox div
+    const lightbox = document.createElement('div');
+    lightbox.classList.add('lightbox');
+
+    // Create lightbox-thumb div
+    const lightboxThumb = document.createElement('div');
+    lightboxThumb.classList.add('lightbox-thumb');
+
+    // Iterate through the array of images
+    lightboxImages.forEach((image, index) => {
+        // Create an img element for each image
+        const img = document.createElement('img');
+        img.setAttribute('src', image);
+        img.setAttribute('alt', `Image ${index + 1}`);
+
+        // Add click event to each image in lightbox-thumb
+        img.addEventListener('click', () => {
+            // Set the clicked image as the source for lightbox
+            lightbox.innerHTML = '';
+            lightbox.appendChild(img.cloneNode(true));
+        });
+        if(index === 0){
+            img.click();
+        }
+        // Append the image to lightbox-thumb
+        lightboxThumb.appendChild(img);
+    });
+
+    // Append lightbox and lightbox-thumb to the lightbox container
+    lightboxContainer.appendChild(lightbox);
+    lightboxContainer.appendChild(lightboxThumb);
+
+    return lightboxContainer;
+}
+
+
+function createModal(title, content, category) {
     // Create modal container
     const modal = document.createElement('div');
     modal.classList.add('modal');
+    modal.style.opacity = 1;
 
     // Create modal content
     const modalContent = document.createElement('div');
@@ -1211,10 +1283,11 @@ function createModal(title, content) {
     closeButton.addEventListener('click', function() {
         if(modalContent.classList.contains('show-modal')){
             modalContent.classList.remove('show-modal');
+            modal.classList.add('hide');
             modalContent.classList.add('hide-modal');
             setTimeout(() => {
                 document.body.removeChild(modal);
-            },500);
+            },495);
         }
     });
     closeDiv.appendChild(closeButton);
@@ -1226,8 +1299,32 @@ function createModal(title, content) {
     // Create modal body
     const modalBody = document.createElement('div');
     modalBody.classList.add('modal-body');
-    // Check if the content is a URL or a link
-    if (isURL(content) || isLink(content)) {
+    if(category === 'SEO'){
+        let lightboxContainer = generateLightBox(content);
+        modalBody.appendChild(lightboxContainer);
+    }else if(category === "Content Writing"){
+
+        const article = document.createElement('article');
+        const contentArray = Object.values(content);
+        // Iterate through each string in the array
+        contentArray.forEach( paragraph => {
+            // Create a div element with class 'para'
+            const paraDiv = document.createElement('div');
+            paraDiv.classList.add('para');
+
+            // Parse the HTML string and append it to the div
+            paraDiv.innerHTML = paragraph;
+
+            // Append the div to the article
+            article.appendChild(paraDiv);
+        });
+        article.addEventListener('selectstart', function (e) {
+            e.preventDefault();
+            alert("You can't select or copy this content.")
+        });
+        modalBody.appendChild(article);
+
+    }else if (isURL(content) || isLink(content)) {
         // If it's a URL or link, create an iframe
         const iframe = document.createElement('iframe');
         iframe.setAttribute('src', content);
@@ -1235,24 +1332,102 @@ function createModal(title, content) {
         iframe.setAttribute('height', '100%');
         iframe.setAttribute('frameborder', '0');
         iframe.setAttribute('allowfullscreen', true);
-
+    
         // Append the iframe to the modal body
         modalBody.appendChild(iframe);
         modalBody.style.height = '500px';
+    }else if (typeof content === 'object') {
+        // If it's an object, convert to array and use forEach loop
+        const contentArray = Object.entries(content);
+
+        modalContent.style.width = '90%';
+    
+        contentArray.forEach(([key, value]) => {
+            const mCard = document.createElement('div');
+            mCard.classList.add('mcard');
+    
+            // Card Header
+            const mCardHeader = document.createElement('div');
+            mCardHeader.classList.add('mcard-header');
+            const headerTitle = document.createElement('h2');
+            headerTitle.textContent = key;
+            mCardHeader.appendChild(headerTitle);
+            mCard.appendChild(mCardHeader);
+    
+            // Card Body
+            const mCardBody = document.createElement('div');
+            mCardBody.classList.add('mcard-body');
+
+            const mCardFooter = document.createElement('div');
+            mCardFooter.classList.add('mcard-footer');
+    
+            // Check if the value is an object
+            if (typeof value === 'object') {
+                // If it's an object, convert to array and use forEach loop
+                const valueArray = Object.entries(value);
+                valueArray.forEach(([innerKey, innerValue]) => {
+                    if(innerKey === "price"){
+                        const paragraph = document.createElement('p');
+                        paragraph.textContent = `${innerKey}: ${innerValue}`;
+                        mCardHeader.appendChild(paragraph);
+                    }else if (innerKey === "planID") {
+                        const button = document.createElement('button');
+                        button.textContent = 'Place Order';
+                        button.addEventListener('click', () => {
+                            console.log(`Clicked on the button with value: ${innerValue}`);
+                        });
+                        mCardFooter.appendChild(button);
+                    }else if (innerKey === "features"){
+                        const featuresHeading = document.createElement('h3');
+                        featuresHeading.textContent = innerKey;
+                        // Append the h3 tag to modal header
+                        mCardBody.appendChild(featuresHeading);
+                    
+                        // Check if the value is an array
+                        if (Array.isArray(innerValue)) {
+                            // Create a ul tag for the features list
+                            const featuresList = document.createElement('ul');
+                    
+                            // Iterate through the array and create list items
+                            innerValue.forEach(feature => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = feature;
+                                featuresList.appendChild(listItem);
+                            });
+                    
+                            // Append the ul to the modal body
+                            mCardBody.appendChild(featuresList);
+                        }
+                    }else{
+                        const paragraph = document.createElement('p');
+                        paragraph.textContent = `${innerKey}: ${innerValue}`;
+                        mCardBody.appendChild(paragraph);
+                    }
+                });
+            } else {
+                // If it's not an object, create a paragraph
+                const paragraph = document.createElement('p');
+                paragraph.textContent = `${key}: ${value}`;
+                mCardBody.appendChild(paragraph);
+            }
+    
+            mCard.appendChild(mCardBody);
+            mCard.appendChild(mCardFooter);
+    
+            // Append the card to the modal body
+            modalBody.appendChild(mCard);
+            modalBody.classList.add('pricing-container', `column${contentArray.length}`);
+        });
     } else {
-        // If it's not a URL or link, use innerHTML as before
+        // If it's not a URL, link, or object, use innerHTML as before
         modalBody.innerHTML = content;
     }
+    
 
-    // Create modal footer
-    const modalFooter = document.createElement('div');
-    modalFooter.classList.add('modal-footer');
-    // Add your footer content if needed
 
     // Append header, body, and footer to modal content
     modalContent.appendChild(modalHeader);
     modalContent.appendChild(modalBody);
-    modalContent.appendChild(modalFooter);
 
     // Append modal content to modal container
     modal.appendChild(modalContent);
