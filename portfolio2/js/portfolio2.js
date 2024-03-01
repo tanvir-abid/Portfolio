@@ -209,11 +209,17 @@ function createTopMenu(name, resumeUrl) {
             menuItem.classList.add('active');
             // Scroll to the corresponding section
             
-const section = document.querySelector(`.section-${item.text.toLowerCase()}`);
-if (section) {
-    const duration = 1000; // Adjust the duration as needed (in milliseconds)
-    smoothScrollTo(section, duration);
-}
+            const section = document.querySelector(`.section-${item.text.toLowerCase()}`);
+            if (section) {
+                // Calculate the offset to stop 100px before the top
+                const offset = section.offsetTop - 100;
+
+                // Scroll into view with the adjusted offset
+                window.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            }
 
 
         });
@@ -255,26 +261,27 @@ if (section) {
 
     return topMenu;
 }
-function smoothScrollTo(target, duration) {
-    const targetPosition = target.offsetTop - 100;
-    const startPosition = window.pageYOffset;
-    const distance = targetPosition - startPosition;
-    const startTime = performance.now();
 
-    function scrollAnimation(currentTime) {
-        const elapsedTime = currentTime - startTime;
-        const progress = Math.min(elapsedTime / duration, 1);
-        const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+// function smoothScrollTo(target, duration) {
+//     const targetPosition = target.offsetTop - 100;
+//     const startPosition = window.pageYOffset;
+//     const distance = targetPosition - startPosition;
+//     const startTime = performance.now();
 
-        window.scrollTo(0, startPosition + distance * easeInOutQuad(progress));
+//     function scrollAnimation(currentTime) {
+//         const elapsedTime = currentTime - startTime;
+//         const progress = Math.min(elapsedTime / duration, 1);
+//         const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-        if (elapsedTime < duration) {
-            requestAnimationFrame(scrollAnimation);
-        }
-    }
+//         window.scrollTo(0, startPosition + distance * easeInOutQuad(progress));
 
-    requestAnimationFrame(scrollAnimation);
-}
+//         if (elapsedTime < duration) {
+//             requestAnimationFrame(scrollAnimation);
+//         }
+//     }
+
+//     requestAnimationFrame(scrollAnimation);
+// }
 //----------------------------------------------------------//
 // create the slider //
 //---------------------------------------------------------//
