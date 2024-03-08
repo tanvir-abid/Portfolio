@@ -262,26 +262,6 @@ function createTopMenu(name, resumeUrl) {
     return topMenu;
 }
 
-// function smoothScrollTo(target, duration) {
-//     const targetPosition = target.offsetTop - 100;
-//     const startPosition = window.pageYOffset;
-//     const distance = targetPosition - startPosition;
-//     const startTime = performance.now();
-
-//     function scrollAnimation(currentTime) {
-//         const elapsedTime = currentTime - startTime;
-//         const progress = Math.min(elapsedTime / duration, 1);
-//         const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-//         window.scrollTo(0, startPosition + distance * easeInOutQuad(progress));
-
-//         if (elapsedTime < duration) {
-//             requestAnimationFrame(scrollAnimation);
-//         }
-//     }
-
-//     requestAnimationFrame(scrollAnimation);
-// }
 //----------------------------------------------------------//
 // create the slider //
 //---------------------------------------------------------//
@@ -542,7 +522,7 @@ function generateServiceCards(data) {
                     observer.unobserve(entry.target); // Stop observing once displayed
                 }
             });
-        }); // Adjust threshold as needed
+        }, { threshold: 0.9 }); // Adjust threshold as needed
         
         // Observe the section containing tab cards
         observer.observe(cardContainer);
@@ -749,7 +729,7 @@ function generateSkillCards(skillsData) {
                     }, 30);
                     observer.unobserve(skillCard); // Stop observing once animation starts
                 }
-            });
+            }, { threshold: 0.9 });
 
             observer.observe(skillCard); // Start observing when the skill card enters the viewport
 
@@ -1172,30 +1152,35 @@ function generateContactContainer(contactData, socialMediaData) {
         const object = Object.fromEntries(formData);
         const json = JSON.stringify(object);
 
-        fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: json
-        })
-        .then(async (response) => {
-            let json = await response.json();
-            if (response.status == 200) {
-                submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
-                createModal('Congratulations','Thank you for reaching out! Your message has been successfully submitted. I will get back to you as soon as possible. If you have any urgent inquiries, feel free to contact me directly via email or phone. Have a great day!');
-                submitButton.disabled = false; 
-                contactForm.reset();
-            } else {
-                alert('Message not sent.');
-                submitButton.disabled = false; 
-                submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        if(validateContactForm(formData)){
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                let json = await response.json();
+                if (response.status == 200) {
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+                    createModal('Congratulations','Thank you for reaching out! Your message has been successfully submitted. I will get back to you as soon as possible. If you have any urgent inquiries, feel free to contact me directly via email or phone. Have a great day!');
+                    submitButton.disabled = false; 
+                    contactForm.reset();
+                } else {
+                    createModal('Ooppss !!!','Message not sent.');
+                    submitButton.disabled = false; 
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }else{
+            submitButton.disabled = false; 
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+        }
     });
     contactFormContainer.appendChild(contactForm);
 
@@ -1203,6 +1188,28 @@ function generateContactContainer(contactData, socialMediaData) {
 
 
     return contactContainer;
+}
+
+function validateContactForm(formData) {
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const subject = formData.get('subject');
+    const message = formData.get('message');
+
+    // Simple email validation using a regular expression
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!name || !email || !subject || !message) {
+        createModal('Warning','Please fill in all fields');
+        return false;
+    }
+
+    if (!emailRegex.test(email)) {
+        createModal('Warning','Please enter a valid email address');
+        return false;
+    }
+
+    return true;
 }
 
 function generateContactForm() {
@@ -1411,7 +1418,10 @@ function createModal(title, content, category) {
         const contentArray = Object.entries(content);
 
         modalContent.style.width = '90%';
-    
+
+        let storedContent;
+        const mCardsContainer = document.createElement('div');
+
         contentArray.forEach(([key, value]) => {
             const mCard = document.createElement('div');
             mCard.classList.add('mcard');
@@ -1436,44 +1446,63 @@ function createModal(title, content, category) {
                 // If it's an object, convert to array and use forEach loop
                 const valueArray = Object.entries(value);
                 valueArray.forEach(([innerKey, innerValue]) => {
-                    if(innerKey === "price"){
+                    if (innerKey === "price") {
                         const paragraph = document.createElement('p');
                         paragraph.textContent = `${innerKey}: ${innerValue}`;
                         mCardHeader.appendChild(paragraph);
-                    }else if (innerKey === "planID") {
+                    } else if (innerKey === "planID") {
                         const button = document.createElement('button');
                         button.textContent = 'Place Order';
                         button.addEventListener('click', () => {
-                            console.log(`Clicked on the button with value: ${innerValue}`);
+                            storedContent = Array.from(modalBody.children);
+
+                            const backButton = document.createElement('span');
+                            backButton.innerHTML = '<i class="fa-solid fa-arrow-left"></i>';
+                            backButton.classList.add('back-button');
+                            backButton.addEventListener('click', () => {
+                                backButton.remove();
+                                modalBody.innerHTML = '';
+                                if (storedContent) {
+                                    storedContent.forEach(item => modalBody.appendChild(item));
+                                }
+                            });
+                            modalTitle.insertBefore(backButton, modalTitle.firstChild);
+                            console.log(value);
+                            // Clear the modal body
+                            modalBody.innerHTML = '';
+                            const orderContainer = generateOrderContainer(value);
+                            modalBody.appendChild(orderContainer); 
+                            
                         });
                         mCardFooter.appendChild(button);
-                    }else if (innerKey === "features"){
+                    } else if (innerKey === "features") {
                         const featuresHeading = document.createElement('h3');
                         featuresHeading.textContent = innerKey;
                         // Append the h3 tag to modal header
                         mCardBody.appendChild(featuresHeading);
-                    
+                
                         // Check if the value is an array
                         if (Array.isArray(innerValue)) {
                             // Create a ul tag for the features list
                             const featuresList = document.createElement('ul');
-                    
+                
                             // Iterate through the array and create list items
                             innerValue.forEach(feature => {
                                 const listItem = document.createElement('li');
                                 listItem.textContent = feature;
                                 featuresList.appendChild(listItem);
                             });
-                    
+                
                             // Append the ul to the modal body
                             mCardBody.appendChild(featuresList);
                         }
-                    }else{
+                    } else {
                         const paragraph = document.createElement('p');
                         paragraph.textContent = `${innerKey}: ${innerValue}`;
                         mCardBody.appendChild(paragraph);
                     }
                 });
+                
             } else {
                 // If it's not an object, create a paragraph
                 const paragraph = document.createElement('p');
@@ -1485,8 +1514,9 @@ function createModal(title, content, category) {
             mCard.appendChild(mCardFooter);
     
             // Append the card to the modal body
-            modalBody.appendChild(mCard);
-            modalBody.classList.add('pricing-container', `column${contentArray.length}`);
+            mCardsContainer.classList.add('pricing-container', `column${contentArray.length}`);
+            mCardsContainer.appendChild(mCard);
+            modalBody.appendChild(mCardsContainer);
         });
     } else {
         // If it's not a URL, link, or object, use innerHTML as before
@@ -1505,6 +1535,77 @@ function createModal(title, content, category) {
     // Append modal to body
     document.body.appendChild(modal);
 }
+
+
+
+function generateOrderContainer(data) {
+    // Create order container
+    const orderContainer = document.createElement('div');
+    orderContainer.classList.add('order-container');
+
+    // Order details container
+    const orderDetailsContainer = document.createElement('div');
+    orderDetailsContainer.classList.add('order-details-container');
+    const detailsH2 = document.createElement('h2');
+    detailsH2.textContent = 'Order Details';
+    orderDetailsContainer.appendChild(detailsH2);
+
+    const orderList = document.createElement('ul');
+    orderList.classList.add('order-list');
+    for (const [key, value] of Object.entries(data)) {
+        const listItem = document.createElement('li');
+        if (Array.isArray(value)) {
+            const featureList = document.createElement('ul');
+            const tagSpan = document.createElement('span');
+            tagSpan.innerHTML = `<strong>${key}</strong>`;
+            featureList.appendChild(tagSpan);
+
+            value.forEach((feature,sl) => {
+                const featureItem = document.createElement('li');
+                featureItem.innerHTML = `${sl+1}. ${feature}`;
+                featureList.appendChild(featureItem);
+            });
+            listItem.appendChild(featureList);
+        } else {
+            listItem.innerHTML = `<strong>${key}:</strong> ${value}`;
+        }
+        orderList.appendChild(listItem);
+    }
+    
+    orderDetailsContainer.appendChild(orderList);
+
+    const orderFormContainer = document.createElement('div');
+    orderFormContainer.classList.add('order-form-container');
+
+    // Add an h2 tag
+    const heading = document.createElement('h2');
+    heading.textContent = 'Place Your Order';
+    orderFormContainer.appendChild(heading);
+
+    // Add a p tag
+    const description = document.createElement('p');
+    description.textContent = 'Please provide the necessary details to place your order.';
+    orderFormContainer.appendChild(description);
+
+    // Here you can add your order form creation logic if needed
+    const orderContactForm = generateContactForm();
+    orderFormContainer.appendChild(orderContactForm);
+
+    // Append order details container and order form container to order container
+    orderContainer.appendChild(orderDetailsContainer);
+    orderContainer.appendChild(orderFormContainer);
+
+    return orderContainer;
+}
+
+
+
+
+
+
+
+
+
 // Function to check if a given string is a URL
 function isURL(str) {
     const urlRegex = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+\/?)?([a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]+)?$/;

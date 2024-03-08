@@ -486,7 +486,8 @@ box-shadow: inset 5px 5px 10px #8d2e25,
 
 .section-services .card-header{
     border-radius: 20px;
-    box-shadow:inset 4px 4px 10px #a6a6a6,inset -4px -4px 10px #ffffff;
+    box-shadow:inset 4px 4px 10px #a6a6a6,
+                inset -4px -4px 10px #ffffff;
 }
 
 .card-header i {
@@ -602,10 +603,6 @@ box-shadow: inset 5px 5px 10px #8d2e25,
     animation: appearIn 0.5s ease-in;
 }
 
-/* @keyframes appearIn {
-    from{opacity: 0;transform: translateY(10px);}
-    to{opacity: 1;transform: translateY(0px);}
-} */
 @keyframes appearIn {
     from{opacity: 0;transform: scale(0.8);}
     to{opacity: 1;transform: scale(1);}
@@ -669,7 +666,7 @@ box-shadow: inset 5px 5px 10px #8d2e25,
     }
 
     .tab-card{
-        width: 95%;
+        width: 90%;
     }
 
     .tab-card .header {
@@ -1444,6 +1441,18 @@ textarea{
     border-bottom: 1px solid #b8b9be;
 }
 
+.modal-header .modal-title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header .modal-title .back-button{
+    cursor: pointer;
+    font-size: 25px;
+    padding: 5px;
+}
+
 .close-div {
     font-size: 24px;
     cursor: pointer;
@@ -1480,6 +1489,7 @@ textarea{
 }
 
 /* Individual Pricing Card */
+
 .mcard {
     background-color: #e6e7ee;
     border-radius: 20px;
@@ -1526,6 +1536,107 @@ textarea{
     border-bottom: 1px solid #999;
     text-transform: capitalize;
 }
+
+/*--------------------------*/
+/* order container style */
+.order-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.order-container h2, .order-container p{
+    text-align: center;
+}
+
+.order-container h2{
+    position: relative;
+}
+
+.order-container h2::after{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    content: '';
+    width: 100%;
+    height: 2px;
+    background-color: #999;
+}
+
+.order-details-container,
+.order-form-container{
+    flex: 1;
+    padding: 20px;
+}
+
+.order-details-container .order-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.order-details-container .order-list li {
+    margin-bottom: 10px;
+    padding: 10px;
+    text-transform: capitalize;
+    border-radius: 5px;
+background: #e6e7ee;
+box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff
+}
+.order-details-container .order-list li ul{
+    max-height: 300px;
+    overflow: auto;
+}
+.order-details-container .order-list li ul li{
+    box-shadow: none;
+    background: none;
+    list-style: none;
+    margin-bottom: 0px;
+    padding: 5px;
+}
+
+.order-form-container form{
+    margin-top: 10px;
+}
+
+.order-form-container form input, 
+.order-form-container form textarea{
+    padding: 5px 10px;
+}
+
+/* Mobile version styles */
+@media screen and (max-width: 768px) {
+    .order-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .order-container h2::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .order-details-container,
+    .order-form-container {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .order-details-container .order-list li {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .order-form-container form input, 
+    .order-form-container form textarea{
+        padding: 5px 10px;
+        width: 95%;
+    }
+}
+
 
 /*-----------------------------*/
 .lightbox img{
@@ -1586,16 +1697,28 @@ background: #EE4266;
         width: 97%;
         max-width: 100%;
     }
+
+    .modal-header .modal-title h1{
+        font-size: 24px;
+    }
+
     .modal-body{
         max-height: 500px;
         overflow: auto;
+        padding: 15px;
     }
+
     .mcard-body {
         padding: 10px;
         margin-bottom: 15px;
         min-height: 0;
         height: auto;
     }
+    
+    .pricing-container{
+        margin-top: 10px;
+    }
+
     .column3,.column4,.column5{
         grid-template-columns: 1fr;
     }
