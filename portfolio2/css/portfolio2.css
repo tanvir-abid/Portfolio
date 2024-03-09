@@ -1472,7 +1472,7 @@ textarea{
 .pricing-container {
     display: grid;
     gap: 15px;
-    margin-top: 30px;
+    margin-top: 20px;
 
 }
 
@@ -1583,8 +1583,8 @@ textarea{
     padding: 10px;
     text-transform: capitalize;
     border-radius: 5px;
-background: #e6e7ee;
-box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff
+    background: #e6e7ee;
+    box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff
 }
 .order-details-container .order-list li ul{
     max-height: 300px;
@@ -1634,6 +1634,11 @@ box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff
     .order-form-container form textarea{
         padding: 5px 10px;
         width: 95%;
+    }
+
+    .order-details-container .order-list li ul li{
+        width: 80%;
+        margin: 0 auto;
     }
 }
 

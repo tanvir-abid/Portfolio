@@ -1467,10 +1467,9 @@ function createModal(title, content, category) {
                                 }
                             });
                             modalTitle.insertBefore(backButton, modalTitle.firstChild);
-                            console.log(value);
                             // Clear the modal body
                             modalBody.innerHTML = '';
-                            const orderContainer = generateOrderContainer(value);
+                            const orderContainer = generateOrderContainer(value, key);
                             modalBody.appendChild(orderContainer); 
                             
                         });
@@ -1538,7 +1537,8 @@ function createModal(title, content, category) {
 
 
 
-function generateOrderContainer(data) {
+function generateOrderContainer(data, planTitle) {
+    console.log(data, planTitle);
     // Create order container
     const orderContainer = document.createElement('div');
     orderContainer.classList.add('order-container');
@@ -1589,6 +1589,55 @@ function generateOrderContainer(data) {
 
     // Here you can add your order form creation logic if needed
     const orderContactForm = generateContactForm();
+    orderContactForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent form submission
+        let submitButton = document.querySelector('.order-form-container button');
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+        submitButton.disabled = true;
+
+        const formData = new FormData(orderContactForm);
+
+        const packageName = document.querySelector('.modal-title h1').textContent;
+        
+        formData.append('packageName', `${packageName+'-'+planTitle}`);
+
+        for (const [key, value] of Object.entries(data)) {
+            formData.append(key, value);
+        }
+
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        if(validateContactForm(formData)){
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                let json = await response.json();
+                if (response.status == 200) {
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+                    createModal('Congratulations','Thank you for reaching out! Your message has been successfully submitted. I will get back to you as soon as possible. If you have any urgent inquiries, feel free to contact me directly via email or phone. Have a great day!');
+                    submitButton.disabled = false; 
+                    orderContactForm.reset();
+                } else {
+                    createModal('Ooppss !!!','Message not sent.');
+                    submitButton.disabled = false; 
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }else{
+            submitButton.disabled = false; 
+                    submitButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit';
+        }
+    });
     orderFormContainer.appendChild(orderContactForm);
 
     // Append order details container and order form container to order container
