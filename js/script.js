@@ -16,11 +16,11 @@ const portfolioProjects = [
     images: ['image4.jpg', 'image5.jpg', 'image6.jpg']
   },
   {
-    name: 'Project 3 (Comming Soon)',
+    name: 'Project 3 (Developing)',
     publishDate: '2023-11-10',
     designTheme: 'Retro',
     synopsis: 'A description of the third project...',
-    path: '/projects/project3',
+    path: 'portfolio3/',
     images: ['image7.jpg', 'image8.jpg', 'image9.jpg']
   },
   {
@@ -109,29 +109,33 @@ function createCard(project) {
   cardBody.className = 'card-body';
 
   const properties = ['name', 'publishDate', 'designTheme', 'synopsis'];
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'portfolio-title';
 
   properties.forEach(prop => {
-    if(prop === "name"){
+    if (prop === "name") {
       const h1 = document.createElement('h1');
       h1.innerHTML = `${project['name']}`;
-      cardBody.appendChild(h1);
-    }else{
+      titleDiv.appendChild(h1);
+      cardBody.appendChild(titleDiv);
+    } else {
       const p = document.createElement('p');
       p.innerHTML = `<strong>${prop.charAt(0).toUpperCase() + prop.slice(1)}:</strong> ${project[prop]}`;
       cardBody.appendChild(p);
     }
   });
 
-  // Button to redirect user to the specified path
+  // Button to redirect the user to the specified path
   const button = document.createElement('button');
-  button.innerHTML = 'View Project';
-  button.onclick = function() {
+  button.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i>';
+  button.onclick = function () {
     window.location.href = project.path;
   };
 
-  cardBody.appendChild(button);
+  titleDiv.appendChild(button);
 
   card.appendChild(cardBody);
+
 
   return card;
 }
@@ -149,3 +153,51 @@ portfolioProjects.forEach(project => {
 
 // Call the renderPortfolio function to display the cards
 renderPortfolio();
+
+
+
+
+function createStars() {
+  const numberOfStars = 100;
+
+  for (let i = 0; i < numberOfStars; i++) {
+      createStar();
+  }
+}
+
+function createStar() {
+  const star = document.createElement('div');
+  star.className = 'star';
+
+  const startX = Math.random() * document.documentElement.clientWidth;
+  const startY = Math.random() * document.documentElement.clientHeight;
+console.log(startX);
+console.log(startY);
+  star.style.left = `${startX}px`;
+  star.style.top = `${startY}px`;
+
+  document.body.appendChild(star);
+
+  animateStar(star);
+}
+
+function animateStar(star) {
+  const speed = Math.random() * 2 + 1; // Adjust speed as needed
+
+  function moveStar() {
+      const currentTop = parseFloat(star.style.top);
+      star.style.top = `${currentTop + speed}px`;
+
+      if (currentTop > window.innerHeight) {
+          // Reset star position if it goes beyond the window
+          star.style.top = '0px';
+          star.style.left = `${Math.random() * window.innerWidth}px`;
+      }
+
+      requestAnimationFrame(moveStar);
+  }
+
+  moveStar();
+}
+
+window.addEventListener('load', createStars);
