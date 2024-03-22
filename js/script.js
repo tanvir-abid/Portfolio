@@ -1,26 +1,26 @@
 const portfolioProjects = [
   {
-    name: 'Portfolio 1',
+    name: 'Diaphanous',
     publishDate: '2023-05-15',
     designTheme: 'Glassmorphic',
     synopsis: 'This portfolio showcases a blend of frontend technologies such as HTML, CSS, and JavaScript for interactive and responsive web design. It leverages modern frameworks like Bootstrap for layout and styling consistency. Dynamic content loading and form submission are handled seamlessly through JavaScript, providing an engaging user experience.',
-    path: 'portfolio1/',
+    path: 'Diaphanous/',
     images: ['image1.jpg', 'image2.jpg', 'image3.jpg']
   },
   {
-    name: 'Portfolio 2',
+    name: 'Penumbra',
     publishDate: '2023-08-20',
     designTheme: 'Neumorphic',
     synopsis: 'This portfolio showcases a blend of cutting-edge web technologies, featuring responsive design with CSS Grid and Flexbox, interactive components powered by JavaScript, and neumorphic design for a modern aesthetic. It leverages modular and maintainable code, optimizing performance for a seamless user experience.',
-    path: 'portfolio2/',
+    path: 'Penumbra/',
     images: ['image4.jpg', 'image5.jpg', 'image6.jpg']
   },
   {
-    name: 'Project 3 (Developing)',
+    name: 'Luminescence (Developing)',
     publishDate: '2023-11-10',
-    designTheme: 'Retro',
-    synopsis: 'A description of the third project...',
-    path: 'portfolio3/',
+    designTheme: 'Neon',
+    synopsis: 'This portfolio boasts a captivating neon-themed design, employing vibrant colors and sleek gradients to create a visually striking experience. Built with meticulous attention to detail, it combines modern web technologies to deliver an immersive and engaging showcase of skills and projects.',
+    path: 'Luminescence/',
     images: ['image7.jpg', 'image8.jpg', 'image9.jpg']
   },
   {
